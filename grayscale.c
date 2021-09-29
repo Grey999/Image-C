@@ -6,6 +6,8 @@
 # include <assert.h>
 # include <err.h>
 
+# include "pixel_operation.h"
+
 SDL_Surface* load_image(char *path)
 {
   SDL_Surface *img;
@@ -75,25 +77,45 @@ void sdl_quitting(){
   printf("Quiting....\n");
 }
 
-int main()
-{
+
+int main(){
   init_sdl();
 
   char str[50];
-  
+
   SDL_Surface* image_surface;
   SDL_Surface* screen_surface;
 
-  printf("Specify the path of the image: ");
+  printf("Specify the name of your image: ");
   if(scanf("%s\n", str) < 50)
     {
       printf("Find image.");
-      printf("Please wait...");
+      printf("grayscale in progress...");
       image_surface = load_image(str);
-      screen_surface = display_image(image_surface);
-      wait_for_keypressed();
-      SDL_FreeSurface(image_surface);
-      SDL_FreeSurface(screen_surface);
+      int h = image_surface -> h;
+      int w = image_surface -> w;
+      Uint32 p = 0;
+      Uint32 average = 0;
+      Uint8 r, g, b;
+      for(int x = 0, x < h, x++)
+	{
+	for(int y = 0, y < w, y++)
+	  {
+	    pixel = get_pixel(image_surface, x, y);
+	    SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
+	    average = 0.3*r + 0.59*g + 0.11*b;
+	    r = average;
+	    g = average;
+	    b = average;
+	    pixel = SDL_MapRGB(image_surface->format, r, g, b);
+	    put_pixel(image_surface, x, y, pixel);
+	  }
+	}
+  image_surface =update_surface(screen_surface, image_surface) ;
+  screen_surface = display_image(image_surface);
+  wait_for_keypressed();
+  SDL_FreeSurface(image_surface);
+  SDL_FreeSurface(screen_surface);
     }
   else printf("Wrong path");
 
