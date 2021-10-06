@@ -5,7 +5,7 @@
 # include <stdio.h>
 # include <assert.h>
 # include <err.h>
-
+# include <math.h>
 # include "pixel_operations.h"
 
 SDL_Surface* load_image(char *path)
@@ -77,47 +77,40 @@ void sdl_quitting(){
   printf("Quiting....\n");
 }
 
+SDL_Surface* rotation(SDL_Surface *img, int  angle)
+{
+  double pi = 3.1415;
+  int c = cos(angle/180*pi);
+  int s = sin(angle/180*pi);
+  int height = img -> h;
+  int width  = img -> w;
+  Uint32 pixel = 0;
+  SDL_Surface* rotate = SDL_CreateRGBSurface(0,height,width,32,0,0,0,0);
 
-int main(){
+  for(int x = 0; x < height; x++)
+    {
+      for(int y = 0; y < width; y++)
+	{
+	  pixel = get_pixel(img,x,y);
+	  put_pixel(rotate,x+c,y+s,pixel);
+	}
+    }
+  return rotate;
+}
+
+int main()
+{
   init_sdl();
-
-  char str[50];
-
-  SDL_Surface* image_surface;
+  SDL_Surface* img_surface;
   SDL_Surface* screen_surface;
 
-  printf("Specify the name of your image: ");
-  if(scanf("%s\n", str) < 50)
-    {
-      printf("Find image.");
-      printf("grayscale in progress...");
-      image_surface = load_image(str);
-      int h = image_surface -> h;
-      int w = image_surface -> w;
-      screen_surface = SDL_CreateRGBSurface(0,w,h,32,0,0,0,0);
-      Uint32 pixel = 0;
-      Uint32 average = 0;
-      Uint8 r, g, b;
-      for(int x = 0; x < h; x++)
-	{
-	  for(int y = 0; y < w; y++)
-	  {
-	    pixel = get_pixel(image_surface, x, y);
-	    SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-	    average = 0.3*r + 0.59*g + 0.11*b;
-	    r = average;
-	    g = average;
-	    b = average;
-	    pixel = SDL_MapRGB(image_surface->format, r, g, b);
-	    put_pixel(image_surface, x, y, pixel);
-	  }
-	}
-      update_surface(screen_surface, image_surface);
-      screen_surface = display_image(image_surface);
-      wait_for_keypressed();
-      SDL_FreeSurface(image_surface);
-      SDL_FreeSurface(screen_surface);
-    }
-  else printf("Wrong path");
+  img_surface = load_image("thanatos.jpg");
+
+  img_surface = rotation(img_surface, 90);
+  screen_surface = display_image(img_surface);
+  wait_for_keypressed();
+  SDL_FreeSurface(img_surface);
+  SDL_FreeSurface(screen_surface);
+
   sdl_quitting();
 }
