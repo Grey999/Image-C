@@ -79,20 +79,33 @@ void sdl_quitting(){
 
 SDL_Surface* rotation(SDL_Surface *img, int  angle)
 {
-  double pi = 3.1415;
-  int c = cos(angle/180*pi);
-  int s = sin(angle/180*pi);
+  double pi = M_PI;
+  int r = 0;
+  int s = 0;
   int height = img -> h;
+  int ymid = height/2;
   int width  = img -> w;
+  int xmid = width/2;
   Uint32 pixel = 0;
   SDL_Surface* rotate = SDL_CreateRGBSurface(0,height,width,32,0,0,0,0);
-
-  for(int x = 0; x < height; x++)
+  double nangle = (angle*180)/pi;
+  if(nangle < 0)
     {
-      for(int y = 0; y < width; y++)
+      nangle = -nangle;
+    }
+  for(int x = 0; x < width; x++)
+    {
+      for(int y = 0; y < height; y++)
 	{
-	  pixel = get_pixel(img,x,y);
-	  put_pixel(rotate,x+c,y+s,pixel);
+	  pixel = 0;
+	  r = (x-xmid)*cos(nangle) - (y-ymid)*sin(nangle) + xmid;
+	  s = (x-xmid)*sin(nangle) + (y-ymid)*cos(nangle) + ymid;
+	  if(r >= 0 && r < xmid && s >= 0 && s < ymid)
+	    {
+	       pixel = get_pixel(img,x,y);
+	    }
+	  put_pixel(rotate,r,s,pixel);
+	 
 	}
     }
   return rotate;
@@ -102,15 +115,21 @@ int main()
 {
   init_sdl();
   SDL_Surface* img_surface;
+  SDL_Surface* rotate;
   SDL_Surface* screen_surface;
 
-  img_surface = load_image("thanatos.jpg");
+  img_surface = load_image("thanatos");
+  rotate = rotation(img_surface, 90);
+  int h = rotate -> h;
+  int w = rotate -> w;
+  screen_surface = SDL_CreateRGBSurface(0,h,w,32,0,0,0,0);
 
-  img_surface = rotation(img_surface, 90);
-  screen_surface = display_image(img_surface);
+  update_surface(screen_surface, rotate);
+  screen_surface = display_image(rotate);
   wait_for_keypressed();
   SDL_FreeSurface(img_surface);
   SDL_FreeSurface(screen_surface);
+  SDL_FreeSurface(rotate);
 
   sdl_quitting();
 }
