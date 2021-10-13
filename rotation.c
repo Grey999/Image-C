@@ -80,29 +80,30 @@ void sdl_quitting(){
 SDL_Surface* rotation(SDL_Surface *img, int  angle)
 {
   double pi = M_PI;
-  int r = 0;
-  int s = 0;
-  int height = img -> h;
-  int ymid = height/2;
-  int width  = img -> w;
-  int xmid = width/2;
+  
+  unsigned int r = 0;
+  unsigned int s = 0;
+  
+  unsigned int height = img -> h;
+  double ymid = height/2;
+  
+  unsigned int width  = img -> w;
+  double xmid = width/2;
+  
   Uint32 pixel = 0;
-  SDL_Surface* rotate = SDL_CreateRGBSurface(0,height,width,32,0,0,0,0);
-  double nangle = (angle*180)/pi;
-  if(nangle < 0)
+  SDL_Surface* rotate = SDL_CreateRGBSurface(0,width,height,32,0,0,0,0);
+  
+  double nangle = ((double)angle/360.0)*2.0*pi;
+  for(unsigned int x = 0; x < width; x++)
     {
-      nangle = -nangle;
-    }
-  for(int x = 0; x < width; x++)
-    {
-      for(int y = 0; y < height; y++)
+      for(unsigned int y = 0; y < height; y++)
 	{
 	  pixel = 0;
-	  r = (x-xmid)*cos(-nangle) - (y-ymid)*sin(-nangle) + xmid;
-	  s = (x-xmid)*sin(-nangle) + (y-ymid)*cos(-nangle) + ymid;
-	  if(r > 0 && r < xmid && s > 0 && s < ymid)
+	  r = (unsigned int)(((double)x-xmid)*cos(nangle) - ((double)y-ymid)*sin(nangle) + xmid);
+	  s = (unsigned int)(((double)x-xmid)*sin(nangle) + ((double)y-ymid)*cos(nangle) + ymid);
+	  if(r > 0 && r < width && s > 0 && s < height)
 	    {
-	       pixel = get_pixel(img,x,y);
+	      pixel = get_pixel(img,x,y);
 	    }
 	  put_pixel(rotate,r,s,pixel);
 	 
@@ -116,20 +117,12 @@ int main()
   init_sdl();
   SDL_Surface* img_surface;
   SDL_Surface* rotate;
-  SDL_Surface* screen_surface;
 
   img_surface = load_image("thanatos");
-  rotate = rotation(img_surface, 90);
-  int h = rotate -> h;
-  int w = rotate -> w;
-  screen_surface = SDL_CreateRGBSurface(0,h,w,32,0,0,0,0);
-
-  update_surface(screen_surface, rotate);
-  screen_surface = display_image(rotate);
-  wait_for_keypressed();
+  rotate = rotation(img_surface, 180);
+  SDL_SaveBMP(rotate, "rotation.bmp");
   SDL_FreeSurface(img_surface);
-  SDL_FreeSurface(screen_surface);
   SDL_FreeSurface(rotate);
-
+ 
   sdl_quitting();
 }
