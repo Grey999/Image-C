@@ -98,9 +98,9 @@ SDL_Surface* rotation(SDL_Surface *img, int  angle)
       for(int y = 0; y < height; y++)
 	{
 	  pixel = 0;
-	  r = (x-xmid)*cos(nangle) - (y-ymid)*sin(nangle) + xmid;
-	  s = (x-xmid)*sin(nangle) + (y-ymid)*cos(nangle) + ymid;
-	  if(r >= 0 && r < xmid && s >= 0 && s < ymid)
+	  r = (x-xmid)*cos(-nangle) - (y-ymid)*sin(-nangle) + xmid;
+	  s = (x-xmid)*sin(-nangle) + (y-ymid)*cos(-nangle) + ymid;
+	  if(r > 0 && r < xmid && s > 0 && s < ymid)
 	    {
 	       pixel = get_pixel(img,x,y);
 	    }
