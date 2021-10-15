@@ -104,8 +104,9 @@ SDL_Surface* rotation(SDL_Surface *img, int  angle)
 	  if(r > 0 && r < width && s > 0 && s < height)
 	    {
 	      pixel = get_pixel(img,x,y);
+	      put_pixel(rotate,r,s,pixel);
+	      
 	    }
-	  put_pixel(rotate,r,s,pixel);
 	 
 	}
     }
@@ -119,10 +120,9 @@ int main()
   SDL_Surface* rotate;
 
   img_surface = load_image("thanatos");
-  rotate = rotation(img_surface, 180);
+  rotate = rotation(img_surface, 18);
   SDL_SaveBMP(rotate, "rotation.bmp");
   SDL_FreeSurface(img_surface);
   SDL_FreeSurface(rotate);
- 
   sdl_quitting();
 }
