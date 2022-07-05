@@ -1,2 +1,2 @@
-# OCR
-OCR du groupe Such a Sofa
+# Image
+Test sur les fonctions image en C
